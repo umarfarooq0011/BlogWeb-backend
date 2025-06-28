@@ -8,10 +8,15 @@ import { seedAdminUser } from "./Admin/adminUtils.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import newsletterRoutes from "./Routes/newsletter.routes.js";
+import path from "path";
+import { fileURLToPath } from "url";
 
 dotenv.config();
 
 const app = express();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const PORT = process.env.PORT || 3000;
 
@@ -41,13 +46,20 @@ app.use(cors({
 //     res.send("Hello World!");
 // })
 
-app.use(express.static('dist'))
+// Serve static files from the React app
+app.use(express.static(path.join(__dirname, '..', 'frontend', 'dist')));
 
 // Routes
 app.use("/api", authRoutes);
 app.use("/api/blog", blogRouter);
 app.use("/api/admin", adminRoutes);
 app.use("/api/newsletter", newsletterRoutes);
+
+// The "catchall" handler: for any request that doesn't
+// match one above, send back React's index.html file.
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'frontend', 'dist', 'index.html'));
+});
 
 app.listen(PORT, async () => {
     await connectDB();
