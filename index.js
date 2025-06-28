@@ -8,62 +8,32 @@ import { seedAdminUser } from "./Admin/adminUtils.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import newsletterRoutes from "./Routes/newsletter.routes.js";
-import path from "path";
-import { fileURLToPath } from "url";
 
 dotenv.config();
 
 const app = express();
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(express.json());  // Allows us to parse incoming requests with JSON payloads
 app.use(cookieParser());
-
-const allowedOrigins = [
-  "http://localhost:5173", // Vite dev server
-  process.env.CLIENT_URL, // Production frontend
-].filter(Boolean); // Filter out undefined/null values
-
 app.use(cors({
-  origin: function (origin, callback) {
-    // Temp log to debug CORS
-    console.log("Request Origin:", origin);
-    console.log("Allowed Origins:", allowedOrigins);
-
-    // allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.indexOf(origin) === -1) {
-      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
-      return callback(new Error(msg), false);
-    }
-    return callback(null, true);
-  },
-  credentials: true, // Allow cookies to be sent
+  origin: "http://localhost:5173", // Vite dev server default port
+  credentials: true // Allow cookies to be sent
 }));
 
 // app.get('/', (req, res) => {
 //     res.send("Hello World!");
 // })
 
-// Serve static files from the React app
-app.use(express.static(path.join(__dirname, '..', 'frontend', 'dist')));
+app.use(express.static('dist'))
 
 // Routes
 app.use("/api", authRoutes);
 app.use("/api/blog", blogRouter);
 app.use("/api/admin", adminRoutes);
 app.use("/api/newsletter", newsletterRoutes);
-
-// The "catchall" handler: for any request that doesn't
-// match one above, send back React's index.html file.
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'frontend', 'dist', 'index.html'));
-});
 
 app.listen(PORT, async () => {
     await connectDB();
