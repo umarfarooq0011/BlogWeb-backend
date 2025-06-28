@@ -27,21 +27,7 @@ if (process.env.FRONTEND_URL) {
   allowedOrigins.push(frontendUrl);
 }
 
-app.use(cors({
-  origin: (origin, callback) => {
-    // The 'origin' header sent by browsers does not include a trailing slash.
-    // We allow requests with no origin (like server-to-server or mobile apps)
-    // and requests from our list of allowed origins.
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      // Log the failed origin for easier debugging
-      console.error(`CORS error: Origin '${origin}' not allowed.`);
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  credentials: true, // Allow cookies to be sent
-}));
+app.use(cors({ origin: true, credentials: true }));
 
 // app.get('/', (req, res) => {
 //     res.send("Hello World!");
