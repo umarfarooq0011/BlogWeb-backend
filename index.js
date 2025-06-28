@@ -8,8 +8,6 @@ import { seedAdminUser } from "./Admin/adminUtils.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import newsletterRoutes from "./Routes/newsletter.routes.js";
-import path from "path";
-import { fileURLToPath } from "url";
 
 dotenv.config();
 
@@ -45,15 +43,6 @@ app.use("/api", authRoutes);
 app.use("/api/blog", blogRouter);
 app.use("/api/admin", adminRoutes);
 app.use("/api/newsletter", newsletterRoutes);
-
-// Catch-all route to serve the frontend's index.html for any other GET request
-// This is essential for single-page applications like React to handle routing correctly.
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "dist", "index.html"));
-});
 
 app.listen(PORT, async () => {
     await connectDB();
