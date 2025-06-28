@@ -19,25 +19,23 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());  // Allows us to parse incoming requests with JSON payloads
 app.use(cookieParser());
 
-// Updated CORS configuration to allow both development and production origins
-const allowedOrigins = [
-  "http://localhost:5173", // Vite dev server default port
-  "https://blogwebapp-production-9923.up.railway.app", // Your Railway domain
-  // Add any other domains you might deploy to
-];
+// Add the deployed frontend URL to the list of allowed origins
+const allowedOrigins = ["http://localhost:5173"];
+if (process.env.FRONTEND_URL) {
+  allowedOrigins.push(process.env.FRONTEND_URL);
+}
 
 app.use(cors({
-  origin: function(origin, callback) {
-    // Allow requests with no origin (like mobile apps, curl requests)
-    if (!origin) return callback(null, true);
-    
-    if (allowedOrigins.indexOf(origin) !== -1) {
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    // or from our list of allowed origins
+    if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'));
+      callback(new Error("Not allowed by CORS"));
     }
   },
-  credentials: true // Allow cookies to be sent
+  credentials: true, // Allow cookies to be sent
 }));
 
 // app.get('/', (req, res) => {

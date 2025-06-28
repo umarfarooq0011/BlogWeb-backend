@@ -272,42 +272,30 @@ export const forgetPassword = async (req, res) => {
   try {
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(400).json({
-        message: "User not found",
-        success: false,
-      });
+      return res.status(404).json({ success: false, message: "User not found" });
     }
 
-    // Generate a reset token
-    const resetToken = crypto.randomBytes(20).toString("hex");
-
-    // Hash the reset token before saving it to the database
-    const hashedToken = await bcrypt.hash(resetToken, 14);
-
-    // Set the reset token and expiration date
-    user.resetPasswordToken = hashedToken;
-    user.resetPasswordExpiresAt = Date.now() + 30 * 60 * 1000; // 30 minutes
+    const resetToken = crypto.randomBytes(32).toString("hex");
+    user.resetPasswordToken = crypto
+      .createHash("sha256")
+      .update(resetToken)
+      .digest("hex");
+    user.resetPasswordExpires = Date.now() + 30 * 60 * 1000; // 30 minutes
 
     await user.save();
-
-    // Determine the client URL based on the request origin
-    const origin = req.headers.origin || req.headers.referer;
-    let clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
     
-    // If the request is coming from the production site, use that URL
-    if (origin && origin.includes('railway.app')) {
-      clientUrl = 'https://blogwebapp-production-9923.up.railway.app';
-    }
+    // Use environment variable for the base URL
+    const baseUrl = process.env.NODE_ENV === 'production' 
+      ? process.env.FRONTEND_URL 
+      : 'http://localhost:5173';
 
-    // Send the reset email with the appropriate URL
-    await sendPasswordResetEmail(
-      user.email,
-      `${clientUrl}/reset-password/${resetToken}`
-    );
+    const resetLink = `${baseUrl}/reset-password/${resetToken}`;
+
+    await sendPasswordResetEmail(user.email, resetLink);
 
     return res.status(200).json({
       success: true,
-      message: "Password reset link sent to your Email",
+      message: "Password reset link has been sent to your email",
     });
   } catch (error) {
     console.error("Forget Password Error:", error.message);
@@ -323,23 +311,19 @@ export const ResetPassword = async (req, res) => {
     const { password } = req.body;
   
     try {
-      // Step 1: Find user with a valid (non-expired) reset token
+      // Step 1: Hash the incoming token so it can be compared with the stored one
+      const resetPasswordToken = crypto
+        .createHash("sha256")
+        .update(token)
+        .digest("hex");
+
+      // Step 2: Find user with a valid (non-expired) and matching reset token
       const user = await User.findOne({
-        resetPasswordExpiresAt: { $gt: Date.now() },
-        resetPasswordToken: { $exists: true } // Ensure the field is set
+        resetPasswordToken,
+        resetPasswordExpires: { $gt: Date.now() },
       });
   
       if (!user) {
-        return res.status(400).json({
-          success: false,
-          message: "Invalid or expired password reset token",
-        });
-      }
-  
-      // Step 2: Compare raw token from URL with hashed token in DB
-      const isTokenValid = await bcrypt.compare(token, user.resetPasswordToken);
-  
-      if (!isTokenValid) {
         return res.status(400).json({
           success: false,
           message: "Invalid or expired password reset token",
@@ -352,7 +336,7 @@ export const ResetPassword = async (req, res) => {
       // Step 4: Update password and clear reset token fields
       user.password = hashedPassword;
       user.resetPasswordToken = undefined;
-      user.resetPasswordExpiresAt = undefined;
+      user.resetPasswordExpires = undefined;
   
       await user.save();
   
