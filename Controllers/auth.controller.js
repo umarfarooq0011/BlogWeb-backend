@@ -284,10 +284,15 @@ export const forgetPassword = async (req, res) => {
 
     await user.save();
     
-    // Construct the reset link using the production frontend URL
-    const baseUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
-    const resetLink = `${baseUrl.replace(/\/$/, '')}/reset-password/${resetToken}`;
+    // Use environment variable for the base URL
+    const baseUrl = process.env.NODE_ENV === 'production' 
+      ? process.env.FRONTEND_URL 
+      : 'http://localhost:5173';
 
+    // Create the complete reset link
+    const resetLink = `${baseUrl}/reset-password/${resetToken}`;
+
+    // Pass the complete link to the email function
     await sendPasswordResetEmail(user.email, resetLink);
 
     return res.status(200).json({
