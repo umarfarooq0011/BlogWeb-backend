@@ -289,10 +289,8 @@ export const forgetPassword = async (req, res) => {
       ? process.env.FRONTEND_URL 
       : 'http://localhost:5173';
 
-    // Create the complete reset link
     const resetLink = `${baseUrl}/reset-password/${resetToken}`;
 
-    // Pass the complete link to the email function
     await sendPasswordResetEmail(user.email, resetLink);
 
     return res.status(200).json({
