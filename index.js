@@ -13,6 +13,9 @@ dotenv.config();
 
 const app = express();
 
+// Trust first proxy - required for Railway, Heroku, etc.
+app.set('trust proxy', 1);
+
 const PORT = process.env.PORT || 3000;
 
 // Middleware

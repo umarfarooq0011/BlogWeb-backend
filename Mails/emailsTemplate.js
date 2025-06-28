@@ -195,7 +195,7 @@ export const PASSWORD_RESET_SUCCESS_TEMPLATE = (name = "User") => `
 
       <!-- Login Button -->
       <div style="text-align:center; margin:30px 0;">
-        <a href="http://localhost:5173/login" style="display:inline-block; background-color:#3b82f6; color:#ffffff; padding:14px 32px; border-radius:8px; text-decoration:none; font-size:16px; font-weight:600;">
+        <a href="${process.env.NODE_ENV === 'production' ? process.env.FRONTEND_URL : 'http://localhost:5173'}/login" style="display:inline-block; background-color:#3b82f6; color:#ffffff; padding:14px 32px; border-radius:8px; text-decoration:none; font-size:16px; font-weight:600;">
           Go to Login
         </a>
       </div>
