@@ -272,35 +272,39 @@ export const forgetPassword = async (req, res) => {
   try {
     const user = await User.findOne({ email });
     if (!user) {
-      return res
-        .status(404)
-        .json({ success: false, message: "User not found" });
+      return res.status(400).json({
+        message: "User not found",
+        success: false,
+      });
     }
 
+    // Generate a reset token
     const resetToken = crypto.randomBytes(20).toString("hex");
-    user.resetPasswordToken = crypto
-      .createHash("sha256")
-      .update(resetToken)
-      .digest("hex");
-    user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+
+    // Hash the reset token before saving it to the database
+    const hashedToken = await bcrypt.hash(resetToken, 14);
+
+    // Set the reset token and expiration date
+    user.resetPasswordToken = hashedToken;
+    user.resetPasswordExpiresAt = Date.now() + 30 * 60 * 1000; // 30 minutes
 
     await user.save();
 
-    // Correctly use the FRONTEND_URL from environment variables for the reset link
-    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
-    const resetUrl = `${frontendUrl}/reset-password/${resetToken}`;
+    // Send the reset email
+    await sendPasswordResetEmail(
+      user.email,
+      `${process.env.CLIENT_URL}/reset-password/${resetToken}`
+    );
 
-    await sendPasswordResetEmail(user.email, resetUrl);
-
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
-      message: `Password reset email sent to ${user.email}`,
+      message: "Password reset link sent to your Email",
     });
   } catch (error) {
-    console.error("Forget Password error:", error);
-    res.status(500).json({
-      success: false,
+    console.error("Forget Password Error:", error.message);
+    return res.status(500).json({
       message: "Internal server error",
+      success: false,
     });
   }
 };
@@ -352,7 +356,7 @@ export const ResetPassword = async (req, res) => {
   
     } catch (error) {
       console.error("Error in ResetPassword:", error);
-      return res.status(500).json({ message: "Internal Server Error" });
+      return res.status(500).json({ success: false, message: "Server error" });
     }
   };
 
@@ -439,57 +443,27 @@ export const getUserActivity = async (req, res) => {
 
 // Resend verification email
 export const resendVerificationEmail = async (req, res) => {
-  const { email } = req.body;
-  try {
-    const user = await User.findOne({ email });
-
-    if (!user) {
-      return res
-        .status(404)
-        .json({ success: false, message: "User not found" });
+    const { email } = req.body;
+    try {
+      const user = await User.findOne({ email });
+      if (!user) {
+        return res.status(404).json({ success: false, message: 'User not found.' });
+      }
+      if (user.isVerified) {
+        return res.status(400).json({ success: false, message: 'Email is already verified.' });
+      }
+      // Generate new verification code
+      const verificationToken = Math.floor(100000 + Math.random() * 900000).toString();
+      const hashedVerificationToken = await bcrypt.hash(verificationToken, 14);
+      user.verificationToken = hashedVerificationToken;
+      user.verificationTokenExpiresAt = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
+    
+      await user.save();
+      await sendVerificationEmail(user.email, verificationToken, user.name);
+      return res.status(200).json({ success: true, message: 'Verification email resent.' });
+    } catch (error) {
+      return res.status(500).json({ success: false, message: 'Server error.' });
     }
-
-    if (user.isVerified) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Email is already verified" });
-    }
-
-    // If user exists and is not verified, generate and send a new token
-    const verificationToken = Math.floor(
-      100000 + Math.random() * 900000
-    ).toString();
-    const hashedVerificationToken = await bcrypt.hash(verificationToken, 14);
-
-    user.verificationToken = hashedVerificationToken;
-    user.verificationTokenExpiresAt = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
-
-    await user.save();
-    await sendVerificationEmail(user.email, verificationToken, user.name);
-
-    return res
-      .status(200)
-      .json({ success: true, message: "Verification email resent successfully" });
-  } catch (error) {
-    console.error("Resend verification email error:", error);
-    return res
-      .status(500)
-      .json({ success: false, message: "Internal server error" });
-  }
-};
-
-export default {
-  signup,
-  verifyEmail,
-  login,
-  logout,
-  deleteAuthorAccount,
-  forgetPassword,
-  ResetPassword,
-  checkauth,
-  checkRole,
-  getUserActivity,
-  resendVerificationEmail,
-};
+  };
 
   

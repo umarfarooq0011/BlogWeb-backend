@@ -19,10 +19,9 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());  // Allows us to parse incoming requests with JSON payloads
 app.use(cookieParser());
 
-const frontendURL = process.env.FRONTEND_URL || "http://localhost:5173";
 
 app.use(cors({
-  origin: frontendURL,
+  origin: "http://localhost:5173", // Vite dev server default port
   credentials: true // Allow cookies to be sent
 }));
 
