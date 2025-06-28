@@ -23,9 +23,11 @@ app.use(cors({
   credentials: true // Allow cookies to be sent
 }));
 
-app.get('/', (req, res) => {
-    res.send("Hello World!");
-});
+// app.get('/', (req, res) => {
+//     res.send("Hello World!");
+// })
+
+app.use(express.static('dist'))
 
 // Routes
 app.use("/api", authRoutes);
