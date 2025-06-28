@@ -19,19 +19,24 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());  // Allows us to parse incoming requests with JSON payloads
 app.use(cookieParser());
 
-// Add the deployed frontend URL to the list of allowed origins
+// Configure CORS to be more robust for production
 const allowedOrigins = ["http://localhost:5173"];
 if (process.env.FRONTEND_URL) {
-  allowedOrigins.push(process.env.FRONTEND_URL);
+  // Remove any trailing slash from the environment variable to ensure a clean comparison
+  const frontendUrl = process.env.FRONTEND_URL.replace(/\/$/, '');
+  allowedOrigins.push(frontendUrl);
 }
 
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    // or from our list of allowed origins
+    // The 'origin' header sent by browsers does not include a trailing slash.
+    // We allow requests with no origin (like server-to-server or mobile apps)
+    // and requests from our list of allowed origins.
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
+      // Log the failed origin for easier debugging
+      console.error(`CORS error: Origin '${origin}' not allowed.`);
       callback(new Error("Not allowed by CORS"));
     }
   },
