@@ -18,9 +18,23 @@ const PORT = process.env.PORT || 3000;
 // Middleware
 app.use(express.json());  // Allows us to parse incoming requests with JSON payloads
 app.use(cookieParser());
+
+const allowedOrigins = [
+  "http://localhost:5173", // Vite dev server
+  process.env.CLIENT_URL, // Production frontend
+].filter(Boolean); // Filter out undefined/null values
+
 app.use(cors({
-  origin: "http://localhost:5173", // Vite dev server default port
-  credentials: true // Allow cookies to be sent
+  origin: function (origin, callback) {
+    // allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  },
+  credentials: true, // Allow cookies to be sent
 }));
 
 // app.get('/', (req, res) => {
