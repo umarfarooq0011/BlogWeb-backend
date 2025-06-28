@@ -290,10 +290,19 @@ export const forgetPassword = async (req, res) => {
 
     await user.save();
 
-    // Send the reset email
+    // Determine the client URL based on the request origin
+    const origin = req.headers.origin || req.headers.referer;
+    let clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
+    
+    // If the request is coming from the production site, use that URL
+    if (origin && origin.includes('railway.app')) {
+      clientUrl = 'https://blogwebapp-production-9923.up.railway.app';
+    }
+
+    // Send the reset email with the appropriate URL
     await sendPasswordResetEmail(
       user.email,
-      `${process.env.CLIENT_URL}/reset-password/${resetToken}`
+      `${clientUrl}/reset-password/${resetToken}`
     );
 
     return res.status(200).json({
