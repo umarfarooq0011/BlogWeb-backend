@@ -275,9 +275,7 @@ export const getNewPostTemplate = (post) => {
         <img src="${post.thumbnail}" alt="${post.title}" class="thumbnail" />
         <div class="content">
           <p>${post.description}</p>
-        </div>
-        <div class="button-container">
-          <a href="${postUrl}" class="button">Read More</a>
+          <p style="margin-top: 15px; font-style: italic; text-align: center;">Visit our website to read the full article.</p>
         </div>
         <div class="footer">
           <p>You are receiving this email because you subscribed to our newsletter.</p>
