@@ -118,10 +118,12 @@ export const sendSubscriptionEmail = async (userEmail) => {
   try {
     await transporter.sendMail({
       ...mailOptions,
+      from: `"InsightSphere" <${process.env.GMAIL_USER}>`,
       to: userEmail,
       subject: 'Subscription Confirmation',
       html: getSubscriptionTemplate(),
     });
+    console.log("✅ Subscription confirmation email sent");
   } catch (error) {
     console.error('Error sending subscription email:', error);
   }
@@ -137,6 +139,7 @@ export const sendNewPostEmail = async (recipientEmails, post) => {
     // Use BCC to send to all subscribers without revealing their emails to each other
     await transporter.sendMail({
       ...mailOptions,
+      from: `"InsightSphere" <${process.env.GMAIL_USER}>`,
       to: process.env.GMAIL_USER, // A dummy "to" address
       bcc: recipientEmails,
       subject: `New Post: ${post.title}`,
