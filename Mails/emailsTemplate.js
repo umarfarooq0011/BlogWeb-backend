@@ -250,7 +250,7 @@ export const getSubscriptionTemplate = () => {
 
 // Template for new post notification
 export const getNewPostTemplate = (post) => {
-  const postUrl = `${process.env.FRONTEND_URL}/blog/${post._id}`; 
+  const postUrl = `${process.env.FRONTEND_URL.endsWith('/') ? process.env.FRONTEND_URL + 'blog/' : process.env.FRONTEND_URL + '/blog/'}${post._id}`; 
   
   return `
     <!DOCTYPE html>
