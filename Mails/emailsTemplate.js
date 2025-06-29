@@ -195,7 +195,7 @@ export const PASSWORD_RESET_SUCCESS_TEMPLATE = (name = "User") => `
 
       <!-- Login Button -->
       <div style="text-align:center; margin:30px 0;">
-        <a href="${process.env.NODE_ENV === 'production' ? process.env.FRONTEND_URL : 'http://localhost:5173'}/login" style="display:inline-block; background-color:#3b82f6; color:#ffffff; padding:14px 32px; border-radius:8px; text-decoration:none; font-size:16px; font-weight:600;">
+        <a href="${process.env.FRONTEND_URL}/login" style="display:inline-block; background-color:#3b82f6; color:#ffffff; padding:14px 32px; border-radius:8px; text-decoration:none; font-size:16px; font-weight:600;">
           Go to Login
         </a>
       </div>
@@ -238,9 +238,7 @@ export const getSubscriptionTemplate = () => {
           <p>Thank you for subscribing to the <strong>InsightSphere</strong> newsletter.</p>
           <p>You're all set to receive the latest news, articles, and updates directly to your inbox.</p>
         </div>
-        <div class="button-container">
-          <a href="${process.env.NODE_ENV === 'production' ? process.env.FRONTEND_URL : 'http://localhost:5173'}" class="button">Visit Website</a>
-        </div>
+      
         <div class="footer">
           <p>&copy; ${new Date().getFullYear()} InsightSphere. All rights reserved.</p>
         </div>
@@ -252,7 +250,7 @@ export const getSubscriptionTemplate = () => {
 
 // Template for new post notification
 export const getNewPostTemplate = (post) => {
-  const postUrl = `${process.env.NODE_ENV === 'production' ? process.env.FRONTEND_URL : 'http://localhost:5173'}/blog/${post._id}`; 
+  const postUrl = `${process.env.FRONTEND_URL}/blog/${post._id}`; 
   
   return `
     <!DOCTYPE html>
