@@ -1,38 +1,29 @@
-# Dependencies
-/node_modules
-
-# Build artifacts
-
-/build
-/out
-
+# Node modules
+node_modules
+# Build output
+dist/
+build/
 # Logs
-logs
-*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
-lcov.info
-
-# Environment variables
+# dotenv environment variables
 .env
-.env.*
-!.env.example
-
-# IDE configuration
-.idea/
+.env.local
+.env.*.local
+# OS files
+.DS_Store
+Thumbs.db
+# VSCode settings
 .vscode/
+# Coverage reports
+coverage/
+# Optional: IDE files
+.idea/
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
-*.swp
-
-# OS generated files
-.DS_Store
-Thumbs.db
-
-# Coverage
-coverage
-.nyc_output 
+# Optional: test output
+test-output/

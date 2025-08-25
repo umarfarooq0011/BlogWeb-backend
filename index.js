@@ -8,44 +8,46 @@ import { seedAdminUser } from "./Admin/adminUtils.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import newsletterRoutes from "./Routes/newsletter.routes.js";
+import path from "path"; // <-- ADD THIS
+import { fileURLToPath } from "url"; // <-- ADD THIS
 
 dotenv.config();
 
-const app = express();
+// Define __dirname for ES modules
+const __filename = fileURLToPath(import.meta.url); // <-- ADD THIS
+const __dirname = path.dirname(__filename); // <-- ADD THIS
 
-// Trust first proxy - required for Railway, Heroku, etc.
+const app = express();
 app.set('trust proxy', 1);
 
 const PORT = process.env.PORT || 3000;
 
-// Middleware
-app.use(express.json());  // Allows us to parse incoming requests with JSON payloads
+app.use(express.json());
 app.use(cookieParser());
 
-// Configure CORS to be more robust for production
 const allowedOrigins = ["http://localhost:5173"];
 if (process.env.FRONTEND_URL) {
-  // Remove any trailing slash from the environment variable to ensure a clean comparison
-  const frontendUrl = process.env.FRONTEND_URL.replace(/\/$/, '');
-  allowedOrigins.push(frontendUrl);
+    const frontendUrl = process.env.FRONTEND_URL.replace(/\/$/, '');
+    allowedOrigins.push(frontendUrl);
 }
-
 app.use(cors({ origin: true, credentials: true }));
 
-// app.get('/', (req, res) => {
-//     res.send("Hello World!");
-// })
+// Serve static files from the 'dist' directory
+app.use(express.static(path.join(__dirname, "dist"))); // <-- CHANGE THIS
 
-app.use(express.static('dist'))
-
-// Routes
+// API Routes
 app.use("/api", authRoutes);
 app.use("/api/blog", blogRouter);
 app.use("/api/admin", adminRoutes);
 app.use("/api/newsletter", newsletterRoutes);
 
+// Catch-all route to serve the frontend's index.html
+app.get("*", (req, res) => { // <-- ADD THIS
+    res.sendFile(path.join(__dirname, "dist", "index.html"));
+});
+
 app.listen(PORT, async () => {
     await connectDB();
-    await seedAdminUser(); // Seed admin user after DB connection
+    await seedAdminUser();
     console.log(`SERVER is running on http://localhost:${PORT}`);
 });

@@ -94,7 +94,7 @@ export const WELCOME_EMAIL_TEMPLATE = (name = "User") => `
 
       <!-- Dashboard Button -->
       <div style="text-align:center; margin-bottom:32px;">
-        <a href="${process.env.FRONTEND_URL_AUTHOR}" style="background-color:#3b82f6; color:#ffffff; text-decoration:none; font-size:16px; font-weight:600; padding:14px 28px; border-radius:8px; display:inline-block;"></a>
+        <a href="${process.env.AUTHOR_URL}" style="background-color:#3b82f6; color:#ffffff; text-decoration:none; font-size:16px; font-weight:600; padding:14px 28px; border-radius:8px; display:inline-block;"></a>
           Go to Dashboard →
         </a>
       </div>
@@ -195,7 +195,7 @@ export const PASSWORD_RESET_SUCCESS_TEMPLATE = (name = "User") => `
 
       <!-- Login Button -->
       <div style="text-align:center; margin:30px 0;">
-        <a href="${process.env.NODE_ENV === 'production' ? process.env.FRONTEND_URL : 'http://localhost:5173'}/login" style="display:inline-block; background-color:#3b82f6; color:#ffffff; padding:14px 32px; border-radius:8px; text-decoration:none; font-size:16px; font-weight:600;">
+        <a href="http://localhost:5173/login" style="display:inline-block; background-color:#3b82f6; color:#ffffff; padding:14px 32px; border-radius:8px; text-decoration:none; font-size:16px; font-weight:600;">
           Go to Login
         </a>
       </div>
@@ -224,10 +224,8 @@ export const getSubscriptionTemplate = () => {
     <head>
       <style>
         .container { font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px; background-color: #f9f9f9; }
-        .header { color: #3b82f6; font-size: 24px; text-align: center; margin-bottom: 20px; }
+        .header { color: #8a2be2; font-size: 24px; text-align: center; margin-bottom: 20px; }
         .content { color: #333; text-align: center; }
-        .button-container { text-align: center; margin: 25px 0; }
-        .button { background-color: #3b82f6; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold; }
         .footer { margin-top: 20px; font-size: 0.8em; text-align: center; color: #777; }
       </style>
     </head>
@@ -235,14 +233,11 @@ export const getSubscriptionTemplate = () => {
       <div class="container">
         <h2 class="header">Subscription Confirmed!</h2>
         <div class="content">
-          <p>Thank you for subscribing to the <strong>InsightSphere</strong> newsletter.</p>
+          <p>Thank you for subscribing to the <strong>Bookify</strong> newsletter.</p>
           <p>You're all set to receive the latest news, articles, and updates directly to your inbox.</p>
         </div>
-        <div class="button-container">
-          <a href="${process.env.NODE_ENV === 'production' ? process.env.FRONTEND_URL : 'http://localhost:5173'}" class="button">Visit Website</a>
-        </div>
         <div class="footer">
-          <p>&copy; ${new Date().getFullYear()} InsightSphere. All rights reserved.</p>
+          <p>&copy; ${new Date().getFullYear()} Bookify. All rights reserved.</p>
         </div>
       </div>
     </body>
@@ -252,7 +247,7 @@ export const getSubscriptionTemplate = () => {
 
 // Template for new post notification
 export const getNewPostTemplate = (post) => {
-  const postUrl = `${process.env.NODE_ENV === 'production' ? process.env.FRONTEND_URL : 'http://localhost:5173'}/blog/${post._id}`; 
+  const postUrl = `http://localhost:5173/blog/${post._id}`; 
   
   return `
     <!DOCTYPE html>
@@ -265,7 +260,7 @@ export const getNewPostTemplate = (post) => {
         .thumbnail { max-width: 100%; border-radius: 8px; margin-bottom: 15px; }
         .content { color: #555; }
         .button-container { text-align: center; margin-top: 20px; }
-        .button { background-color: #3b82f6; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold; }
+        .button { background-color: #fff; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold; }
         .footer { margin-top: 25px; font-size: 0.8em; text-align: center; color: #777; }
       </style>
     </head>
@@ -283,7 +278,7 @@ export const getNewPostTemplate = (post) => {
         </div>
         <div class="footer">
           <p>You are receiving this email because you subscribed to our newsletter.</p>
-          <p>&copy; ${new Date().getFullYear()} InsightSphere. All rights reserved.</p>
+          <p>&copy; ${new Date().getFullYear()} Bookify. All rights reserved.</p>
         </div>
       </div>
     </body>
