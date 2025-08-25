@@ -46,8 +46,12 @@ app.get("*", (req, res) => {
 // --- Database Connection ---
 connectDB().then(() => {
     seedAdminUser();
+    console.log("Database connected successfully");
+    // Start the server
+    // app.listen(process.env.PORT || 5000, () => {
+    //     console.log(`Server is running on port ${process.env.PORT || 8000}`);
+    // });
 });
-
 // --- Export the app for Vercel ---
 // We DO NOT use app.listen()
 export default app;
