@@ -2,12 +2,14 @@ import { VERIFICATION_EMAIL_TEMPLATE, WELCOME_EMAIL_TEMPLATE, PASSWORD_RESET_REQ
 import { transporter } from "./nodemailer.config.js";
 import path from "path";
 import { fileURLToPath } from "url";
-import fs from "fs";
 import { getSubscriptionTemplate, getNewPostTemplate } from './emailsTemplate.js';
 
 // Get the directory name properly in ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// Path to static logo used in email templates
+const logoPath = path.join(__dirname, "../dist/assets/logo.png");
 
 // Define mailOptions here
 const mailOptions = {
@@ -16,18 +18,12 @@ const mailOptions = {
 };
 
 export const sendVerificationEmail = async (email, code, name) => {
-  // Path to logo relative to this file
-  const logoPath = path.join(
-    __dirname,
-    "../../frontend/public/assets/logo.png"
-  );
-
   const mailOptions = {
     from: `"InsightSphere" <${process.env.GMAIL_USER} >`,
     to: email,
     subject: "Email Verification Code",
     html: VERIFICATION_EMAIL_TEMPLATE(code, name),
-  
+
   };
 
   try {
@@ -40,12 +36,6 @@ export const sendVerificationEmail = async (email, code, name) => {
 };
 
 export const sendWelcomeEmail = async (email, name="User") => {
-  // Path to logo relative to this file
-  const logoPath = path.join(
-    __dirname,
-    "../../frontend/public/assets/logo.png"
-  );
-
   const mailOptions = {
     from: `"InsightSphere" <${process.env.GMAIL_USER} >`,
     to: email,
@@ -71,12 +61,6 @@ export const sendWelcomeEmail = async (email, name="User") => {
 
 
 export const sendPasswordResetEmail = async (email, resetLink) => {
-  // Path to logo relative to this file
-  const logoPath = path.join(
-    __dirname,
-    "../../frontend/public/assets/logo.png"
-  );
-  
   const mailOptions = {
     from: `"InsightSphere" <${process.env.GMAIL_USER} >`,
     to: email,
@@ -102,10 +86,6 @@ export const sendPasswordResetEmail = async (email, resetLink) => {
 
 
 export const sendResetSuccessEmail = async (email, name= "User") => {
-  const logoPath = path.join(
-    __dirname,
-    "../../frontend/public/assets/logo.png"
-  );
   const mailOptions = {
     from: `"InsightSphere" <${process.env.GMAIL_USER} >`,
     to: email,
