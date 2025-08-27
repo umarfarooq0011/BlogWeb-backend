@@ -99,7 +99,12 @@ export const verifyEmail = async (req, res) => {
     user.verificationTokenExpiresAt = undefined;
     await user.save();
 
-    await sendWelcomeEmail(user.email, user.name);
+    // Send welcome email but do not block verification on failure
+    try {
+      await sendWelcomeEmail(user.email, user.name);
+    } catch (err) {
+      console.error("Welcome email error:", err.message);
+    }
 
     return res.status(200).json({
       success: true,

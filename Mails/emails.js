@@ -39,95 +39,101 @@ export const sendVerificationEmail = async (email, code, name) => {
   }
 };
 
-export const sendWelcomeEmail = async (email, name="User") => {
-  // Path to logo relative to this file
+export const sendWelcomeEmail = async (email, name = "User") => {
   const logoPath = path.join(
     __dirname,
     "../../frontend/public/assets/logo.png"
   );
+
+  const attachments = [];
+  if (fs.existsSync(logoPath)) {
+    attachments.push({
+      filename: "logo.png",
+      path: logoPath,
+      cid: "logo",
+    });
+  }
 
   const mailOptions = {
     from: `"InsightSphere" <${process.env.GMAIL_USER} >`,
     to: email,
     subject: "Welcome to InsightSphere",
     html: WELCOME_EMAIL_TEMPLATE(name),
-    attachments: [
-      {
-        filename: "logo.png",
-        path: logoPath,
-        cid: "logo", // Content ID referenced in the HTML
-      },
-    ],
+    ...(attachments.length ? { attachments } : {}),
   };
 
   try {
     const info = await transporter.sendMail(mailOptions);
     console.log("✅ Email sent:", info.messageId);
   } catch (error) {
-    console.error("❌ Email sending failed:", error.message);
-    throw new Error("Failed to send welcome email.");
+    // Log the error but do not throw so verification can still succeed
+    console.error("❌ Welcome email failed:", error.message);
   }
 };
 
 
 export const sendPasswordResetEmail = async (email, resetLink) => {
-  // Path to logo relative to this file
   const logoPath = path.join(
     __dirname,
     "../../frontend/public/assets/logo.png"
   );
-  
+
+  const attachments = [];
+  if (fs.existsSync(logoPath)) {
+    attachments.push({
+      filename: "logo.png",
+      path: logoPath,
+      cid: "logo",
+    });
+  }
+
   const mailOptions = {
     from: `"InsightSphere" <${process.env.GMAIL_USER} >`,
     to: email,
     subject: "Password Reset Request",
     html: PASSWORD_RESET_REQUEST_TEMPLATE(resetLink),
-    attachments: [
-      {
-        filename: "logo.png",
-        path: logoPath,
-        cid: "logo", // Content ID referenced in the HTML
-      },
-    ],
-  }
+    ...(attachments.length ? { attachments } : {}),
+  };
 
   try {
     const info = await transporter.sendMail(mailOptions);
     console.log("✅ Email sent:", info.messageId);
   } catch (error) {
-    console.error("❌ Email sending failed:", error.message);
-    throw new Error("Failed to send password reset email.");
+    console.error("❌ Password reset email failed:", error.message);
   }
-}
+};
 
 
-export const sendResetSuccessEmail = async (email, name= "User") => {
+export const sendResetSuccessEmail = async (email, name = "User") => {
   const logoPath = path.join(
     __dirname,
     "../../frontend/public/assets/logo.png"
   );
+
+  const attachments = [];
+  if (fs.existsSync(logoPath)) {
+    attachments.push({
+      filename: "logo.png",
+      path: logoPath,
+      cid: "logo",
+    });
+  }
+
   const mailOptions = {
     from: `"InsightSphere" <${process.env.GMAIL_USER} >`,
     to: email,
     subject: "Password Reset Success",
     html: PASSWORD_RESET_SUCCESS_TEMPLATE(name),
-    attachments: [
-      {
-        filename: "logo.png",
-        path: logoPath,
-        cid: "logo", // Content ID referenced in the HTML
-      },
-    ],
-  }
+    ...(attachments.length ? { attachments } : {}),
+  };
 
   try {
     const info = await transporter.sendMail(mailOptions);
     console.log("✅ Email sent:", info.messageId);
   } catch (error) {
-    console.error("❌ Email sending failed:", error.message);
-    throw new Error("Failed to send reset success email.");
+    console.error("❌ Reset success email failed:", error.message);
   }
-}
+};
 
 // Function to send a "thank you for subscribing" email
 export const sendSubscriptionEmail = async (userEmail) => {
