@@ -94,7 +94,7 @@ export const WELCOME_EMAIL_TEMPLATE = (name = "User") => `
 
       <!-- Dashboard Button -->
       <div style="text-align:center; margin-bottom:32px;">
-        <a href="${process.env.AUTHOR_URL}" style="background-color:#3b82f6; color:#ffffff; text-decoration:none; font-size:16px; font-weight:600; padding:14px 28px; border-radius:8px; display:inline-block;"></a>
+        <a href="${process.env.AUTHOR_URL}" style="background-color:#3b82f6; color:#ffffff; text-decoration:none; font-size:16px; font-weight:600; padding:14px 28px; border-radius:8px; display:inline-block;">
           Go to Dashboard →
         </a>
       </div>
@@ -263,7 +263,7 @@ export const getNewPostTemplate = (post) => {
         .thumbnail { max-width: 100%; border-radius: 8px; margin-bottom: 15px; }
         .content { color: #555; }
         .button-container { text-align: center; margin-top: 20px; }
-        .button { background-color: #fff; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold; }
+        .button { background-color: #8a2be2; color: #ffffff; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold; }
         .footer { margin-top: 25px; font-size: 0.8em; text-align: center; color: #777; }
       </style>
     </head>
@@ -276,6 +276,9 @@ export const getNewPostTemplate = (post) => {
         <div class="content">
           <p>${post.description}</p>
           <p style="margin-top: 15px; font-style: italic; text-align: center;">Visit our website to read the full article.</p>
+        </div>
+        <div class="button-container">
+          <a href="${postUrl}" class="button">Read Full Post</a>
         </div>
         <div class="footer">
           <p>You are receiving this email because you subscribed to our newsletter.</p>
