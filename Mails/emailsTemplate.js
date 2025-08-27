@@ -218,6 +218,11 @@ export const PASSWORD_RESET_SUCCESS_TEMPLATE = (name = "User") => `
 
 // Template for newsletter subscription confirmation
 export const getSubscriptionTemplate = () => {
+  const siteUrl = (() => {
+    const prodUrl = process.env.FRONTEND_URL || (process.env.AUTHOR_URL ? process.env.AUTHOR_URL.replace(/\/author.*$/, '') : undefined);
+    return process.env.NODE_ENV === 'production' ? prodUrl || 'https://example.com' : 'http://localhost:5173';
+  })();
+
   return `
     <!DOCTYPE html>
     <html>
@@ -226,6 +231,8 @@ export const getSubscriptionTemplate = () => {
         .container { font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px; background-color: #f9f9f9; }
         .header { color: #8a2be2; font-size: 24px; text-align: center; margin-bottom: 20px; }
         .content { color: #333; text-align: center; }
+        .button-container { text-align: center; margin-top: 20px; }
+        .button { background-color: #8a2be2; color: #ffffff; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block; }
         .footer { margin-top: 20px; font-size: 0.8em; text-align: center; color: #777; }
       </style>
     </head>
@@ -237,7 +244,7 @@ export const getSubscriptionTemplate = () => {
           <p>You're all set to receive the latest news, articles, and updates directly to your inbox.</p>
         </div>
         <div class="button-container">
-          <a href="${process.env.NODE_ENV === 'production' ? process.env.FRONTEND_URL : 'http://localhost:5173'}" class="button">Visit Website</a>
+          <a href="${siteUrl}" class="button">Visit Website</a>
         </div>
         <div class="footer">
           <p>&copy; ${new Date().getFullYear()} Bookify. All rights reserved.</p>
@@ -250,7 +257,11 @@ export const getSubscriptionTemplate = () => {
 
 // Template for new post notification
 export const getNewPostTemplate = (post) => {
-  const postUrl = `${process.env.NODE_ENV === 'production' ? process.env.FRONTEND_URL : 'http://localhost:5173'}/blog/${post._id}`; 
+  const baseUrl = (() => {
+    const prodUrl = process.env.FRONTEND_URL || (process.env.AUTHOR_URL ? process.env.AUTHOR_URL.replace(/\/author.*$/, '') : undefined);
+    return process.env.NODE_ENV === 'production' ? prodUrl || 'https://example.com' : 'http://localhost:5173';
+  })();
+  const postUrl = `${baseUrl}/blog/${post._id}`;
   
   return `
     <!DOCTYPE html>
