@@ -99,7 +99,15 @@ export const verifyEmail = async (req, res) => {
     user.verificationTokenExpiresAt = undefined;
     await user.save();
 
-    await sendWelcomeEmail(user.email, user.name);
+    // Sending a welcome email is a nice-to-have feature, but failures here
+    // shouldn't prevent the user from verifying their account. If the
+    // email service is misconfigured or temporarily unavailable, swallow
+    // the error and still respond with success so the frontend can proceed.
+    try {
+      await sendWelcomeEmail(user.email, user.name);
+    } catch (emailErr) {
+      console.error("Welcome email error:", emailErr.message);
+    }
 
     return res.status(200).json({
       success: true,
@@ -252,7 +260,14 @@ export const forgetPassword = async (req, res) => {
     await user.save();
 
     const resetUrl = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
-    await sendPasswordResetEmail(user.email, resetUrl);
+    // Attempt to send the reset email, but don't fail the request if the
+    // email service is unavailable. This prevents confusing 500 responses
+    // when the core logic has succeeded.
+    try {
+      await sendPasswordResetEmail(user.email, resetUrl);
+    } catch (emailErr) {
+      console.error("Password reset email error:", emailErr.message);
+    }
 
     return res.status(200).json({
       success: true,
@@ -313,7 +328,14 @@ export const ResetPassword = async (req, res) => {
     userToUpdate.resetPasswordExpiresAt = undefined;
 
     await userToUpdate.save();
-    await sendResetSuccessEmail(userToUpdate.email, userToUpdate.name);
+
+    // Similar to verification, sending the confirmation email is secondary
+    // to actually updating the password. Handle email failures gracefully.
+    try {
+      await sendResetSuccessEmail(userToUpdate.email, userToUpdate.name);
+    } catch (emailErr) {
+      console.error("Reset success email error:", emailErr.message);
+    }
 
     return res
       .status(200)
