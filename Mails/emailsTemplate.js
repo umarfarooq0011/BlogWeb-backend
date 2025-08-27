@@ -55,7 +55,20 @@ export const VERIFICATION_EMAIL_TEMPLATE = (verificationCode, userName = "User")
 `;
 
 
-export const WELCOME_EMAIL_TEMPLATE = (name = "User") => `
+export const WELCOME_EMAIL_TEMPLATE = (name = "User") => {
+  const dashboardUrl = (() => {
+    const base =
+      process.env.FRONTEND_URL ||
+      (process.env.AUTHOR_URL
+        ? process.env.AUTHOR_URL.replace(/\/author.*$/, '')
+        : undefined);
+    if (process.env.NODE_ENV === 'production') {
+      return process.env.AUTHOR_URL || `${base || 'https://blog-web-backend-lake.vercel.app'}/author`;
+    }
+    return 'http://localhost:5173/author';
+  })();
+
+  return `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -94,7 +107,7 @@ export const WELCOME_EMAIL_TEMPLATE = (name = "User") => `
 
       <!-- Dashboard Button -->
       <div style="text-align:center; margin-bottom:32px;">
-        <a href="${process.env.AUTHOR_URL}" style="background-color:#3b82f6; color:#ffffff; text-decoration:none; font-size:16px; font-weight:600; padding:14px 28px; border-radius:8px; display:inline-block;">
+        <a href="${dashboardUrl}" style="background-color:#3b82f6; color:#ffffff; text-decoration:none; font-size:16px; font-weight:600; padding:14px 28px; border-radius:8px; display:inline-block;">
           Go to Dashboard →
         </a>
       </div>
@@ -110,11 +123,12 @@ export const WELCOME_EMAIL_TEMPLATE = (name = "User") => `
       &copy; ${new Date().getFullYear()} InsightSphere • All Rights Reserved
     </div>
 
-  </div>
+    </div>
 
-</body>
-</html>
+  </body>
+  </html>
 `;
+};
 
 
 export const PASSWORD_RESET_REQUEST_TEMPLATE = (resetLink) => `
@@ -220,7 +234,7 @@ export const PASSWORD_RESET_SUCCESS_TEMPLATE = (name = "User") => `
 export const getSubscriptionTemplate = () => {
   const siteUrl = (() => {
     const prodUrl = process.env.FRONTEND_URL || (process.env.AUTHOR_URL ? process.env.AUTHOR_URL.replace(/\/author.*$/, '') : undefined);
-    return process.env.NODE_ENV === 'production' ? prodUrl || 'https://example.com' : 'http://localhost:5173';
+    return process.env.NODE_ENV === 'production' ? prodUrl || 'https://blog-web-backend-lake.vercel.app' : 'http://localhost:5173';
   })();
 
   return `
@@ -259,7 +273,7 @@ export const getSubscriptionTemplate = () => {
 export const getNewPostTemplate = (post) => {
   const baseUrl = (() => {
     const prodUrl = process.env.FRONTEND_URL || (process.env.AUTHOR_URL ? process.env.AUTHOR_URL.replace(/\/author.*$/, '') : undefined);
-    return process.env.NODE_ENV === 'production' ? prodUrl || 'https://example.com' : 'http://localhost:5173';
+    return process.env.NODE_ENV === 'production' ? prodUrl || 'https://blog-web-backend-lake.vercel.app' : 'http://localhost:5173';
   })();
   const postUrl = `${baseUrl}/blog/${post._id}`;
   
