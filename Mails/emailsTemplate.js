@@ -55,7 +55,20 @@ export const VERIFICATION_EMAIL_TEMPLATE = (verificationCode, userName = "User")
 `;
 
 
-export const WELCOME_EMAIL_TEMPLATE = (name = "User") => `
+export const WELCOME_EMAIL_TEMPLATE = (name = "User") => {
+  const dashboardUrl = (() => {
+    const base =
+      process.env.FRONTEND_URL ||
+      (process.env.AUTHOR_URL
+        ? process.env.AUTHOR_URL.replace(/\/author.*$/, '')
+        : undefined);
+    if (process.env.NODE_ENV === 'production') {
+      return process.env.AUTHOR_URL || `${base || 'https://blog-web-backend-lake.vercel.app'}/author`;
+    }
+    return 'http://localhost:5173/author';
+  })();
+
+  return `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -94,7 +107,7 @@ export const WELCOME_EMAIL_TEMPLATE = (name = "User") => `
 
       <!-- Dashboard Button -->
       <div style="text-align:center; margin-bottom:32px;">
-        <a href="${process.env.AUTHOR_URL}" style="background-color:#3b82f6; color:#ffffff; text-decoration:none; font-size:16px; font-weight:600; padding:14px 28px; border-radius:8px; display:inline-block;"></a>
+        <a href="${dashboardUrl}" style="background-color:#3b82f6; color:#ffffff; text-decoration:none; font-size:16px; font-weight:600; padding:14px 28px; border-radius:8px; display:inline-block;">
           Go to Dashboard →
         </a>
       </div>
@@ -110,11 +123,12 @@ export const WELCOME_EMAIL_TEMPLATE = (name = "User") => `
       &copy; ${new Date().getFullYear()} InsightSphere • All Rights Reserved
     </div>
 
-  </div>
+    </div>
 
-</body>
-</html>
+  </body>
+  </html>
 `;
+};
 
 
 export const PASSWORD_RESET_REQUEST_TEMPLATE = (resetLink) => `
@@ -218,6 +232,11 @@ export const PASSWORD_RESET_SUCCESS_TEMPLATE = (name = "User") => `
 
 // Template for newsletter subscription confirmation
 export const getSubscriptionTemplate = () => {
+  const siteUrl = (() => {
+    const prodUrl = process.env.FRONTEND_URL || (process.env.AUTHOR_URL ? process.env.AUTHOR_URL.replace(/\/author.*$/, '') : undefined);
+    return process.env.NODE_ENV === 'production' ? prodUrl || 'https://blog-web-backend-lake.vercel.app' : 'http://localhost:5173';
+  })();
+
   return `
     <!DOCTYPE html>
     <html>
@@ -226,6 +245,8 @@ export const getSubscriptionTemplate = () => {
         .container { font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px; background-color: #f9f9f9; }
         .header { color: #8a2be2; font-size: 24px; text-align: center; margin-bottom: 20px; }
         .content { color: #333; text-align: center; }
+        .button-container { text-align: center; margin-top: 20px; }
+        .button { background-color: #8a2be2; color: #ffffff; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block; }
         .footer { margin-top: 20px; font-size: 0.8em; text-align: center; color: #777; }
       </style>
     </head>
@@ -237,7 +258,7 @@ export const getSubscriptionTemplate = () => {
           <p>You're all set to receive the latest news, articles, and updates directly to your inbox.</p>
         </div>
         <div class="button-container">
-          <a href="${process.env.NODE_ENV === 'production' ? process.env.FRONTEND_URL : 'http://localhost:5173'}" class="button">Visit Website</a>
+          <a href="${siteUrl}" class="button">Visit Website</a>
         </div>
         <div class="footer">
           <p>&copy; ${new Date().getFullYear()} Bookify. All rights reserved.</p>
@@ -250,7 +271,11 @@ export const getSubscriptionTemplate = () => {
 
 // Template for new post notification
 export const getNewPostTemplate = (post) => {
-  const postUrl = `${process.env.NODE_ENV === 'production' ? process.env.FRONTEND_URL : 'http://localhost:5173'}/blog/${post._id}`; 
+  const baseUrl = (() => {
+    const prodUrl = process.env.FRONTEND_URL || (process.env.AUTHOR_URL ? process.env.AUTHOR_URL.replace(/\/author.*$/, '') : undefined);
+    return process.env.NODE_ENV === 'production' ? prodUrl || 'https://blog-web-backend-lake.vercel.app' : 'http://localhost:5173';
+  })();
+  const postUrl = `${baseUrl}/blog/${post._id}`;
   
   return `
     <!DOCTYPE html>
@@ -263,7 +288,7 @@ export const getNewPostTemplate = (post) => {
         .thumbnail { max-width: 100%; border-radius: 8px; margin-bottom: 15px; }
         .content { color: #555; }
         .button-container { text-align: center; margin-top: 20px; }
-        .button { background-color: #fff; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold; }
+        .button { background-color: #8a2be2; color: #ffffff; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold; }
         .footer { margin-top: 25px; font-size: 0.8em; text-align: center; color: #777; }
       </style>
     </head>
@@ -276,6 +301,9 @@ export const getNewPostTemplate = (post) => {
         <div class="content">
           <p>${post.description}</p>
           <p style="margin-top: 15px; font-style: italic; text-align: center;">Visit our website to read the full article.</p>
+        </div>
+        <div class="button-container">
+          <a href="${postUrl}" class="button">Read Full Post</a>
         </div>
         <div class="footer">
           <p>You are receiving this email because you subscribed to our newsletter.</p>
